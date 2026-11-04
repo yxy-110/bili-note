@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<title>B站字幕转结构化笔记</title>
+<style>
+*{box-sizing:border-box;font-family:system-ui}
+body{max-width:900px;margin:30px auto;padding:0 20px;}
+#linkInput{width:100%;padding:10px;font-size:16px;margin:10px 0;}
+button{padding:10px 20px;background:#00a1d6;color:#fff;border:none;border-radius:6px;cursor:pointer;}
+#loading{display:none;color:#00a1d6;margin:10px 0;}
+.box{margin-top:20px}
+pre{white-space:pre-wrap;background:#f5f5f5;padding:12px;border-radius:6px;max-height:400px;overflow:auto;}
+</style>
+</head>
+<body>
+<h2>B站视频转结构化笔记</h2>
+<p>粘贴B站视频链接（视频必须自带CC字幕）</p>
+<input id="linkInput" placeholder="例如：https://www.bilibili.com/video/BVxxxxxx/">
+<button onclick="run()">生成笔记</button>
+<div id="loading">正在抓取字幕+AI总结，请稍候...</div>
+<div class="box">
+    <h3>📝 整理后的笔记</h3>
+    <pre id="noteResult"></pre>
+</div>
+<div class="box">
+    <h3>📄 原始字幕（带时间戳）</h3>
+    <pre id="subResult"></pre>
+</div>
+
+<script>
+// ========== 这里后面要替换成Render给你的地址 ==========
+const API_URL = "https://这里替换成你的render地址.onrender.com/api/get_note"
+
+async function run(){
+    const link = document.getElementById('linkInput').value.trim()
+    if(!link) return alert("请输入B站链接")
+    document.getElementById('loading').style.display = 'block'
+    document.getElementById('noteResult').innerText = ''
+    document.getElementById('subResult').innerText = ''
+    try{
+        const res = await fetch(API_URL,{
+            method:"POST",
+            headers:{"Content-Type":"application/json"},
+            body:JSON.stringify({bv:link})
+        })
+        const data = await res.json()
+        if(!res.ok) throw new Error(data.detail || "出错")
+        document.getElementById('noteResult').innerText = data.note
+        document.getElementById('subResult').innerText = data.subtitle
+    }catch(e){
+        alert("失败："+e.message)
+    }finally{
+        document.getElementById('loading').style.display = 'none'
+    }
+}
+</script>
+</body>
+</html>

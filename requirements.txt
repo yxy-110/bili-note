@@ -1,0 +1,6 @@
+fastapi
+uvicorn
+bilibili-api-python
+requests
+python-multipart
+pydantic
